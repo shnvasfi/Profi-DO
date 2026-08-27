@@ -1,0 +1,74 @@
+name: Build (macOS + Windows)
+
+# Ne zaman çalışır:
+#   - main dalına her push'ta          -> sadece derler, indirilebilir "artifact" üretir (test amaçlı)
+#   - "v1.0.0" gibi bir tag push'unda  -> derler VE GitHub Releases'e otomatik yükler
+#   - Actions sekmesinden manuel de tetiklenebilir (workflow_dispatch)
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform_name: Windows
+            add_data_sep: ';'
+          - os: macos-latest
+            platform_name: macOS
+            add_data_sep: ':'
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Kodu çek
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Bağımlılıkları kur
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Derle (PyInstaller)
+        run: >
+          pyinstaller --noconfirm --onefile --windowed
+          --name "WinsaProfilKesim"
+          --add-data "ui${{ matrix.add_data_sep }}ui"
+          main.py
+
+      - name: Derleme çıktısını yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinsaProfilKesim-${{ matrix.platform_name }}
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release oluştur (sadece tag push'unda)
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Derleme çıktılarını indir
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Release oluştur / güncelle
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/WinsaProfilKesim-Windows/**
+            artifacts/WinsaProfilKesim-macOS/**
+          draft: false
+          generate_release_notes: true

@@ -1,0 +1,12 @@
+# Winsa Profil Kesim Programı — Bağımlılıklar
+# pip install -r requirements.txt
+
+PySide6>=6.5.0          # GUI
+matplotlib>=3.7.0       # 2D/3D görselleştirme
+ezdxf>=1.1.0            # DXF dosya okuma
+numpy>=1.24.0           # Matematiksel işlemler
+pandas>=2.0.0           # Excel veri işleme
+openpyxl>=3.1.0         # Excel okuma/yazma (.xlsx)
+Pillow>=10.0.0          # Çerçeve görsel/raporu için görüntü oluşturma
+reportlab>=4.0.0        # PDF rapor üretimi
+pyodbc>=5.0.0; sys_platform == "win32"   # Windows MDB bağlantısı (sadece Windows'ta kurulur)

@@ -1,0 +1,41 @@
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ── Derleme çıktıları (PyInstaller vb.) ──────────────────────
+build/
+dist/
+*.dmg
+*.exe
+
+# ── Java köprüsü (Mac MDB) derleme çıktısı ───────────────────
+java_libs/*.class
+
+# ── İşletim sistemi / editör ─────────────────────────────────
+.DS_Store
+**/.DS_Store
+._*
+**/._*
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# ── Office geçici kilit dosyaları ─────────────────────────────
+~$*
+
+# ── Kullanıcıya özel yerel veriler (repo dışında, ~/.winsa_profil altında
+#    saklanır; burada asla oluşmaz ama emniyet için eklendi) ─────────────
+.winsa_profil/
+
+# ── Gerçek üretim/iş verileri — KOD DEĞİL, repo'ya girmemeli ───
+profile_library.json
+profile_library.xlsx
+Profil Dxf Dosyalar/
+Profil İşlemleri.xlsx
+*.dxf
