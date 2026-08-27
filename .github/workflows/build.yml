@@ -42,14 +42,14 @@ jobs:
       - name: Derle (PyInstaller)
         run: >
           pyinstaller --noconfirm --onefile --windowed
-          --name "WinsaProfilKesim"
+          --name "KSB_ProfilKesim"
           --add-data "ui${{ matrix.add_data_sep }}ui"
           main.py
 
       - name: Derleme çıktısını yükle
         uses: actions/upload-artifact@v4
         with:
-          name: WinsaProfilKesim-${{ matrix.platform_name }}
+          name: KSB_ProfilKesim-${{ matrix.platform_name }}
           path: dist/*
           if-no-files-found: error
 
@@ -68,7 +68,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/WinsaProfilKesim-Windows/**
-            artifacts/WinsaProfilKesim-macOS/**
+            artifacts/KSB_ProfilKesim-Windows/**
+            artifacts/KSB_ProfilKesim-macOS/**
           draft: false
           generate_release_notes: true

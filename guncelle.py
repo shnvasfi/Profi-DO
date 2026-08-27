@@ -39,6 +39,7 @@ files = [
     ('requirements.txt',                       'requirements.txt'),
     ('.gitignore',                             '.gitignore'),
     ('.github/workflows/build.yml',            '.github/workflows/build.yml'),
+    ('build_exe.bat',                          'build_exe.bat'),
     ('guncelle.py',                            'guncelle.py'),   # kendini de guncelle
 ]
 
