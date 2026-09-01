@@ -253,8 +253,9 @@ class SplashScreen(QWidget):
         tx = ax + 52
         self._draw_texts(p, tx, W, H, fa)
 
-        # ── 9. Alt şerit + imza ──────────────────────────
+        # ── 9. Alt şerit + logo + imza ────────────────────
         self._draw_bottom(p, W, H, fa)
+        self._draw_logo(p, W, H, fa)
         self._draw_signature(p, W, H, fa)
 
         # ── 10. "Devam etmek için tıklayın" ipucu ────────
@@ -532,8 +533,25 @@ class SplashScreen(QWidget):
             p.drawText(tx + 14, fy + 15, desc)
             fy += 42
 
+    def _draw_logo(self, p, W, H, fa):
+        """Ekranın sağ üst köşesi — Yılmaz logosu."""
+        logo_pix = QPixmap(LOGO_PATH)
+        if logo_pix.isNull():
+            return
+        margin_x = 36
+        margin_y = 24
+        logo_h   = 44
+        logo_w   = int(logo_h * logo_pix.width() / max(1, logo_pix.height()))
+        logo_x   = W - margin_x - logo_w
+        logo_y   = margin_y
+        p.save()
+        p.setOpacity(fa / 255)
+        p.drawPixmap(logo_x, logo_y, logo_w, logo_h, logo_pix)
+        p.setOpacity(1.0)
+        p.restore()
+
     def _draw_signature(self, p, W, H, fa):
-        """Ekranın sol alt köşesi — üstte Yılmaz logosu, altında el yazısı imza."""
+        """Ekranın sol alt köşesi — el yazısı imza."""
         from PySide6.QtGui import QFontDatabase
         cursive_fonts = [
             'Snell Roundhand', 'Apple Chancery', 'Bradley Hand ITC',
@@ -546,31 +564,11 @@ class SplashScreen(QWidget):
         NAME = 'V.Şahin'
         f_sign = QFont(cf, 14); f_sign.setItalic(True)
 
-        # Ölç
-        p.setFont(f_sign)
-        fm_s = p.fontMetrics()
-        sign_h = fm_s.height()
-
         margin_x   = 36   # alt ilerleme çubuğuyla aynı sol boşluk
-        logo_h     = 40
-        gap        = 8    # logo ile imza arası boşluk
         bottom_pad = 58   # alt ilerleme çubuğunun (H-44) üstünde kalsın
 
-        sig_y  = H - bottom_pad                  # imza taban çizgisi
-        logo_y = sig_y - sign_h - gap - logo_h    # logonun üst kenarı
-
-        # ── Yılmaz logosu ──
-        logo_pix = QPixmap(LOGO_PATH)
-        if not logo_pix.isNull():
-            logo_w = int(logo_h * logo_pix.width() / max(1, logo_pix.height()))
-            p.save()
-            p.setOpacity(fa / 255)
-            p.drawPixmap(margin_x, int(logo_y), logo_w, logo_h, logo_pix)
-            p.setOpacity(1.0)
-            p.restore()
-
-        # ── İmza metni (arka plan yok) ──
         sig_x = margin_x
+        sig_y = H - bottom_pad   # imza taban çizgisi
 
         # Gölge
         p.setFont(f_sign)
