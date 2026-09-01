@@ -10,11 +10,14 @@ SRC = os.path.expanduser(
 
 files = [
     ('models.py',                              'models.py'),
+    ('paths.py',                               'paths.py'),
+    ('version.py',                             'version.py'),
     ('settings.py',                            'settings.py'),
     ('database.py',                            'database.py'),
     ('kanat_operations.py',                    'kanat_operations.py'),
     ('code_generator.py',                      'code_generator.py'),
     # NOT: profile_library.json / .xlsx KOPYALANMIYOR — kullanici verisi ezilmesin
+    ('ui/kiosk.py',                            'ui/kiosk.py'),
     ('ui/panel_operations.py',                 'ui/panel_operations.py'),
     ('ui/panel_tools.py',                      'ui/panel_tools.py'),
     ('ui/main_window.py',                      'ui/main_window.py'),
@@ -22,7 +25,6 @@ files = [
     ('ui/dialog_kanat_auto.py',                'ui/dialog_kanat_auto.py'),
     ('ui/splash_screen.py',                    'ui/splash_screen.py'),
     ('main.py',                                'main.py'),
-    ('ui/dialog_frame_designer.py',            'ui/dialog_frame_designer.py'),
     ('ui/viewport_widget.py',                  'ui/viewport_widget.py'),
     ('ui/dialog_profil_kutuphanesi.py',        'ui/dialog_profil_kutuphanesi.py'),
     ('ui/dialog_akilli_uretim.py',             'ui/dialog_akilli_uretim.py'),
@@ -40,13 +42,19 @@ files = [
     ('.gitignore',                             '.gitignore'),
     ('.github/workflows/build.yml',            '.github/workflows/build.yml'),
     ('build_exe.bat',                          'build_exe.bat'),
+    ('setup_windows.bat',                      'setup_windows.bat'),
+    ('setup_mac.sh',                           'setup_mac.sh'),
     ('guncelle.py',                            'guncelle.py'),   # kendini de guncelle
 ]
 
 for src_rel, dst_rel in files:
     src = os.path.join(SRC, src_rel)
-    os.makedirs(os.path.dirname(os.path.abspath(dst_rel)) if os.path.dirname(dst_rel) else '.', exist_ok=True)
-    shutil.copy(src, dst_rel)
-    print('Kopyalandi:', dst_rel)
+    try:
+        os.makedirs(os.path.dirname(os.path.abspath(dst_rel)) if os.path.dirname(dst_rel) else '.', exist_ok=True)
+        shutil.copy(src, dst_rel)
+        print('Kopyalandi:', dst_rel)
+    except FileNotFoundError:
+        # Kaynakta artik olmayan (kaldirilmis) bir dosya - atla, devam et.
+        print('Atlandi (kaynakta yok, kaldirilmis olabilir):', dst_rel)
 
 print('Tamamlandi!')

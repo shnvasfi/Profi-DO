@@ -1,20 +1,21 @@
 """
 code_generator.py – Stok kodu bazlı P-code üretim motoru
-Winsa Profil Kesim Programı
+ProfiDO (KSB_ProfilKesim) Programı
 """
 
 import json
 import os
 import copy
+import paths
 
-# ── Kütüphane dosyası: sabit konumda (~/.winsa_profil/) ──────────────────────
+# ── Kütüphane dosyası: sabit konumda (~/.ksb_profil/) ──────────────────────
 # Dahili format: JSON (hızlı). Excel sadece dışa/içe aktarım için kullanılır.
-_LIB_DIR  = os.path.join(os.path.expanduser('~'), '.winsa_profil')
+_LIB_DIR  = paths.app_data_dir()
 _LIB_PATH = os.path.join(_LIB_DIR, 'profile_library.json')
 _XLS_PATH = os.path.join(_LIB_DIR, 'profile_library.xlsx')   # dışa aktarım
 os.makedirs(_LIB_DIR, exist_ok=True)
 
-# Eski konum: prg dizinindeki .json → ~/.winsa_profil/ altına taşı
+# Eski konum: prg dizinindeki .json → ~/.ksb_profil/ altına taşı
 _OLD_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'profile_library.json')
 if os.path.exists(_OLD_JSON) and not os.path.exists(_LIB_PATH):
     import shutil
@@ -243,7 +244,7 @@ def _ensure_openpyxl():
 def export_to_excel(library: dict, path: str = None) -> str:
     """
     Kütüphaneyi Excel dosyasına aktar.
-    path verilmezse ~/.winsa_profil/profile_library.xlsx kullanılır.
+    path verilmezse ~/.ksb_profil/profile_library.xlsx kullanılır.
     Kaydedilen dosya yolunu döner.
     """
     fpath = path or _XLS_PATH

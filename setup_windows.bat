@@ -2,7 +2,7 @@
 REM ================================================
 REM Windows Kurulum Scripti
 REM ================================================
-echo === Winsa Profil Kesim - Windows Kurulum ===
+echo === ProfiDO (KSB_ProfilKesim) - Windows Kurulum ===
 echo.
 
 REM Python kontrolu
@@ -20,7 +20,7 @@ call venv\Scripts\activate.bat
 
 echo [2/3] Kutuphaneler yukleniyor...
 pip install --upgrade pip
-pip install PySide6 matplotlib ezdxf numpy pandas openpyxl pyodbc
+pip install -r requirements.txt
 
 echo [3/3] Kurulum tamamlandi!
 echo.

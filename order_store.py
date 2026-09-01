@@ -1,12 +1,12 @@
 """
 order_store.py
-Winsa Profil Kesim — Akıllı Üretim sipariş/çizim kalıcılığı.
+ProfiDO (KSB_ProfilKesim) — Akıllı Üretim sipariş/çizim kalıcılığı.
 
 Bir "sipariş", bir veya daha fazla "çizim" (çerçeve) içeren, isim/müşteri
-bilgisiyle etiketlenmiş bir kayıttır. Her sipariş, ~/.winsa_profil/orders/
+bilgisiyle etiketlenmiş bir kayıttır. Her sipariş, ~/.ksb_profil/orders/
 altında tek bir JSON dosyası olarak saklanır (dosya adı: order_id.json).
 
-Dosya konumu: ~/.winsa_profil/orders/<order_id>.json
+Dosya konumu: ~/.ksb_profil/orders/<order_id>.json
 
 Bir sipariş sözlüğünün (order dict) şekli (bkz. ui/dialog_akilli_uretim.py
 AkilliUretimDialog._gather_order_dict / load_order_data):
@@ -31,8 +31,9 @@ import json
 import os
 import uuid
 import datetime
+import paths
 
-_ORDERS_DIR = os.path.join(os.path.expanduser('~'), '.winsa_profil', 'orders')
+_ORDERS_DIR = os.path.join(paths.app_data_dir(), 'orders')
 
 
 def orders_dir() -> str:

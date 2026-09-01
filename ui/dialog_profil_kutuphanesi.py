@@ -18,6 +18,7 @@ from PySide6.QtGui import QColor, QFont, QBrush
 import code_generator as cg
 from dxf_loader import load_dxf, calc_profile_dimensions, get_bounds
 from ui.viewport_widget import ViewportWidget
+from ui.kiosk import apply_kiosk
 
 # ── Kasa işlemleri (Tip A) ────────────────────────────────────────────────────
 _KASA_OPS = [
@@ -877,11 +878,18 @@ class ProfilKutuphanesiDialog(QDialog):
     library_changed  = Signal()
     request_dxf_pick = Signal()   # geriye donuk uyumluluk
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, restricted=False):
         super().__init__(parent)
         self.setWindowTitle('Profil Kutuphanesi Yoneticisi')
         self.resize(1200, 720)
+        apply_kiosk(self)   # tam ekran, çerçevesiz kiosk modu
         self.setStyleSheet(_STYLE)
+
+        # restricted=True: ana ekrandaki "Profil Kütüphanesi" butonundan açılır —
+        # sadece mevcut profillerin üzerinde değişiklik yapılabilir.
+        # Yeni profil ekleme / kopyalama / silme / toplu Excel yükleme
+        # yalnızca Ayarlar > Profil Tanımlama sekmesinden (restricted=False) yapılabilir.
+        self._restricted     = restricted
 
         self._library        = cg.load_library()
         self._cur_code       = None
@@ -935,13 +943,19 @@ class ProfilKutuphanesiDialog(QDialog):
         self._tree = QTreeWidget(); self._tree.setHeaderHidden(True); self._tree.setIndentation(14)
         self._tree.currentItemChanged.connect(self._on_tree_selection)
         llay.addWidget(self._tree, 1)
-        btn_row = QHBoxLayout(); btn_row.setSpacing(3)
-        for label, obj, slot in [('+ Yeni','btn_add',self._new_profile),
-                                  ('Kopyala','btn_dup',self._duplicate_profile),
-                                  ('Sil','btn_del',self._delete_profile)]:
-            b = QPushButton(label); b.setObjectName(obj); b.clicked.connect(slot)
-            btn_row.addWidget(b)
-        llay.addLayout(btn_row)
+        if not self._restricted:
+            btn_row = QHBoxLayout(); btn_row.setSpacing(3)
+            for label, obj, slot in [('+ Yeni','btn_add',self._new_profile),
+                                      ('Kopyala','btn_dup',self._duplicate_profile),
+                                      ('Sil','btn_del',self._delete_profile)]:
+                b = QPushButton(label); b.setObjectName(obj); b.clicked.connect(slot)
+                btn_row.addWidget(b)
+            llay.addLayout(btn_row)
+        else:
+            lbl_ro = QLabel('Sadece mevcut profiller üzerinde\ndeğişiklik yapılabilir.')
+            lbl_ro.setStyleSheet('color:#888; font-size:10px; padding:2px;')
+            lbl_ro.setWordWrap(True)
+            llay.addWidget(lbl_ro)
         splitter.addWidget(left)
 
         # Sag: sekmeler
@@ -957,16 +971,22 @@ class ProfilKutuphanesiDialog(QDialog):
         btn_xls_exp.setToolTip('Kütüphaneyi .xlsx dosyasına aktar (görüntüleme / düzenleme)')
         btn_xls_exp.clicked.connect(self._export_excel)
         bar.addWidget(btn_xls_exp)
-        btn_xls_imp = QPushButton('📥 Excel\'den Yükle')
-        btn_xls_imp.setObjectName('btn_dxf'); btn_xls_imp.setFixedHeight(32)
-        btn_xls_imp.setToolTip('Düzenlenmiş .xlsx dosyasından kütüphaneyi geri yükle')
-        btn_xls_imp.clicked.connect(self._import_excel)
-        bar.addWidget(btn_xls_imp)
+        if not self._restricted:
+            btn_xls_imp = QPushButton('📥 Excel\'den Yükle')
+            btn_xls_imp.setObjectName('btn_dxf'); btn_xls_imp.setFixedHeight(32)
+            btn_xls_imp.setToolTip('Düzenlenmiş .xlsx dosyasından kütüphaneyi geri yükle')
+            btn_xls_imp.clicked.connect(self._import_excel)
+            bar.addWidget(btn_xls_imp)
         bar.addStretch()
         btn_s = QPushButton('Kutuphanesi Kaydet')
         btn_s.setObjectName('btn_save'); btn_s.setFixedHeight(32)
         btn_s.clicked.connect(self._save_library)
-        bar.addWidget(btn_s); rlay.addLayout(bar)
+        bar.addWidget(btn_s)
+        btn_close = QPushButton('Kapat')
+        btn_close.setFixedHeight(32)
+        btn_close.clicked.connect(self.close)
+        bar.addWidget(btn_close)
+        rlay.addLayout(bar)
         splitter.addWidget(right)
         splitter.setSizes([220, 980])
         root.addWidget(splitter, 1)

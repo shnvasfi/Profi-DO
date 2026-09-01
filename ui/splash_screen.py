@@ -4,13 +4,18 @@ ui/splash_screen.py  —  Animasyonlu Açılış Ekranı
 Akıcı partikül animasyonu, neon glow efektleri, profesyonel tipografi.
 """
 
-import math, random, os
+import math, random, os, sys, datetime
 from PySide6.QtWidgets import QWidget, QApplication
 from PySide6.QtCore    import Qt, QTimer, QPointF, Signal, QRectF
 from PySide6.QtGui     import (
     QPainter, QColor, QLinearGradient, QRadialGradient,
     QFont, QPen, QBrush, QPolygonF, QPixmap, QPainterPath
 )
+
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
+from version import __version__ as APP_VERSION
 
 # ── Fotoğraf yolu ────────────────────────────────────────
 # Program klasörünün altındaki ProfiDO_IM.png dosyası
@@ -58,8 +63,8 @@ class SplashScreen(QWidget):
     def __init__(self, exit_mode: bool = False):
         super().__init__()
         self._exit_mode = exit_mode   # True: 'Programı Kapat' butonu göster
-        # Ekran boyutlarını al
-        screen = QApplication.primaryScreen().availableGeometry()
+        # Ekran boyutlarını al — kiosk modu: menü çubuğu dahil TAM fiziksel ekran
+        screen = QApplication.primaryScreen().geometry()
         self.W = screen.width()
         self.H = screen.height()
 
@@ -93,6 +98,7 @@ class SplashScreen(QWidget):
         )
         self.setAttribute(Qt.WA_TranslucentBackground, False)
         self.setGeometry(screen)   # Tam ekran
+        self.setWindowState(Qt.WindowFullScreen)   # Kiosk modu — menü çubuğu/dock da kapansın
 
         self._timer = QTimer(self)
         self._timer.setInterval(16)   # ~60fps
@@ -502,7 +508,7 @@ class SplashScreen(QWidget):
 
         # Özellik listesi
         features = [
-            ('Çerçeve Tasarımcısı',     'Kasa & Kanat otomatik çerçeve oluşturma'),
+            ('Akıllı Üretim',           'Profil kütüphanesinden otomatik çerçeve oluşturma'),
             ('DXF Profil Görüntüleyici','2D/3D profil kesit ekranı & ekstrüzyon'),
             ('Otomatik P Kodu Üretimi', 'Kanat / Kasa tüm işlemleri otomatik'),
             ('Toplu Kesim & MDB',       'Bar optimizasyonu & Excel/MDB çıktısı'),
@@ -536,7 +542,7 @@ class SplashScreen(QWidget):
         avail = QFontDatabase.families()
         cf = next((f for f in cursive_fonts if f in avail), 'Arial')
 
-        NAME = 'V.Sahin'
+        NAME = 'V.Şahin'
         f_sign = QFont(cf, 14); f_sign.setItalic(True)
 
         # Ölç
@@ -601,10 +607,16 @@ class SplashScreen(QWidget):
         p.setPen(pc)
         p.drawText(bar_x, bar_y + 18, f'{COMPANY}  ·  {PROG_NAME}')
 
-        # Versiyon (sağ)
-        vc = QColor('#222244'); vc.setAlpha(fa)
+        # Versiyon (sağ) — açık renk, koyu arka planda net okunsun
+        f_ver = QFont('Arial', 10, QFont.DemiBold)
+        p.setFont(f_ver)
+        vc = QColor('#c7d2f5'); vc.setAlpha(fa)
         p.setPen(vc)
-        p.drawText(W - 110, bar_y + 18, 'v1.0  ·  2026')
+        yil = datetime.date.today().year
+        ver_text = f'v{APP_VERSION}  ·  {yil}'
+        fm_v = p.fontMetrics()
+        vw = fm_v.horizontalAdvance(ver_text)
+        p.drawText(W - vw - 36, bar_y + 18, ver_text)
 
         # Alt çerçeve çizgisi
         blg = QLinearGradient(0, 0, W, 0)

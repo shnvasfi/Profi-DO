@@ -1,4 +1,4 @@
-# Winsa Profil Kesim Programı — Bağımlılıklar
+# ProfiDO (KSB_ProfilKesim) Programı — Bağımlılıklar
 # pip install -r requirements.txt
 
 PySide6>=6.5.0          # GUI

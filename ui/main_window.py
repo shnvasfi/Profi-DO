@@ -34,10 +34,10 @@ from ui.panel_tools import ToolsPanel
 from ui.panel_operations import OperationsPanel
 from ui.dialog_record import RecordDialog
 from ui.dialog_batch import BatchEntryDialog
-from ui.dialog_frame_designer import FrameDesignerDialog
 from ui.dialog_profil_kutuphanesi import ProfilKutuphanesiDialog
 from ui.dialog_akilli_uretim import AkilliUretimDialog
 from ui.dialog_ayarlar import AyarlarDialog
+from ui.kiosk import apply_kiosk
 
 
 class MainWindow(QMainWindow):
@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
         self._quit_blocked = False              # closeEvent kapanmayı engeller mi?
         self.setWindowTitle('ProfiDO')
         self.setMinimumSize(900, 600)
-        self.showMaximized()   # Tam ekran başlat
+        apply_kiosk(self)   # Tam ekran, çerçevesiz kiosk modu
 
         # Durum
         self._raw_segs     = []   # Orijinal DXF segmentleri
@@ -148,16 +148,6 @@ class MainWindow(QMainWindow):
         btn_mdb = QPushButton('💾 MDB Bağlan')
         btn_mdb.clicked.connect(self._open_mdb)
         tb.addWidget(btn_mdb)
-
-        btn_frame = QPushButton('🏗 Çerçeve Tasarımcısı')
-        btn_frame.setStyleSheet(
-            'QPushButton{background:#1a5c5c;color:white;border-radius:4px;'
-            'font-size:12px;font-weight:bold;padding:4px 12px;}'
-            'QPushButton:hover{background:#237575;}'
-        )
-        btn_frame.setToolTip('W×H girerek 4 profil parçasını otomatik hesapla')
-        btn_frame.clicked.connect(self._open_frame_designer)
-        tb.addWidget(btn_frame)
 
         btn_batch = QPushButton('📋 Toplu Kesim Girişi')
         btn_batch.setStyleSheet(
@@ -564,14 +554,6 @@ class MainWindow(QMainWindow):
     # Toplu kesim girişi
     # ─────────────────────────────────────────────────────
 
-    def _open_frame_designer(self):
-        try:
-            dlg = FrameDesignerDialog(self, db=self._db)
-            dlg.show()
-        except Exception as e:
-            import traceback
-            QMessageBox.critical(self, 'Hata', f'{e}\n\n{traceback.format_exc()}')
-
     def _open_batch(self):
         """Toplu Kesim Girişi — önce MDB seçimi, sonra mevcut liste yüklenir."""
         try:
@@ -637,7 +619,7 @@ class MainWindow(QMainWindow):
 
     def _open_profil_kutuphanesi(self):
         try:
-            dlg = ProfilKutuphanesiDialog(self)
+            dlg = ProfilKutuphanesiDialog(self, restricted=True)
 
             # DXF pick entegrasyonu ─────────────────────────────────────
             def _on_dxf_pick_requested():

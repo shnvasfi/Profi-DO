@@ -1,6 +1,6 @@
 """
 ui/dialog_siparis_listesi.py – Sipariş Listesi Ekranı
-Winsa Profil Kesim Programı
+ProfiDO (KSB_ProfilKesim) Programı
 
 Akıllı Üretim ekranında kaydedilen siparişleri (her biri bir veya daha
 fazla çizim/çerçeve içerebilir) listeler; buradan:
@@ -27,6 +27,7 @@ from PySide6.QtCore import Qt
 
 import order_store as ordst
 from ui.dialog_akilli_uretim import _STYLE
+from ui.kiosk import apply_kiosk
 
 COLS = ['Sipariş No', 'Müşteri Adı', 'Müşteri Kodu', 'Çizim Sayısı', 'Toplam Parça', 'Son Güncelleme']
 
@@ -38,6 +39,7 @@ class SiparisListesiDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle('📁 Siparişler')
         self.resize(820, 520)
+        apply_kiosk(self)   # tam ekran, çerçevesiz kiosk modu
         self.setStyleSheet(_STYLE)
         self._db = db
         self._orders = []          # order_store.list_orders() sonucu (özet)

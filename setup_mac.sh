@@ -3,7 +3,7 @@
 # Mac'te Geliştirme Ortamı Kurulum Scripti
 # ================================================
 
-echo "=== Winsa Profil Kesim — Mac Kurulum ==="
+echo "=== ProfiDO (KSB_ProfilKesim) — Mac Kurulum ==="
 echo ""
 
 # Python versiyonu kontrol

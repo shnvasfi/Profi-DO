@@ -27,6 +27,7 @@ from PySide6.QtGui import QColor, QFont
 from PySide6.QtGui import QFont, QColor
 
 from models import PROFILE_TYPES, COLOR_CODES, SIDES
+from ui.kiosk import apply_kiosk
 
 SAW_KERF = 60   # testere payı ×10 (6 mm)
 
@@ -47,6 +48,7 @@ class BatchEntryDialog(QDialog):
         self.setWindowTitle("Toplu Kesim Listesi Girişi")
         self.setMinimumSize(860, 680)
         self.resize(980, 740)
+        apply_kiosk(self)   # tam ekran, çerçevesiz kiosk modu
         self._setup_ui()
         self._apply_style()
 

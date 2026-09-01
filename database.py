@@ -6,7 +6,7 @@ Mac/Linux: SQLite geliştirme modu → aynı veriler SQLite'a yazar
            + yanında otomatik Excel dosyası oluşturulur/güncellenir
 
 Excel dosyası: seçilen dosyanın yanına _data.xlsx olarak kaydedilir.
-Örnek: Winsa70_Kanat.mdb  →  Winsa70_Kanat_data.xlsx
+Örnek: Profil70_Kanat.mdb  →  Profil70_Kanat_data.xlsx
 """
 
 import os

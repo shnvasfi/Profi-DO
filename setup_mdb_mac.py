@@ -183,7 +183,7 @@ def compile_java_helper():
 
 def main():
     print('=' * 60)
-    print('  Winsa – Mac MDB Kurulum Scripti (subprocess modu)')
+    print('  ProfiDO – Mac MDB Kurulum Scripti (subprocess modu)')
     print('  NOT: JPype kullanmaz — crash sorunu yok!')
     print('=' * 60)
     print()

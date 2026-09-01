@@ -1,6 +1,6 @@
 """
 dialog_ayarlar.py
-Winsa Profil Kesim – Şifreli İki Kademeli Ayarlar Dialogu.
+ProfiDO (KSB_ProfilKesim) – Şifreli İki Kademeli Ayarlar Dialogu.
 
 Kullanım akışı:
   1. AyarlarDialog(parent) oluştur ve exec() çağır.
@@ -17,12 +17,14 @@ from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QGridLayout, QFormLayout,
     QGroupBox, QLabel, QSpinBox, QPushButton, QLineEdit,
     QFrame, QTabWidget, QWidget, QCheckBox, QScrollArea,
-    QMessageBox,
+    QMessageBox, QRadioButton, QButtonGroup,
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QIcon
 
 import settings as st
+from ui.kiosk import apply_kiosk
+from ui.dialog_profil_kutuphanesi import ProfilKutuphanesiDialog
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Ortak stil
@@ -117,7 +119,7 @@ class _PasswordDialog(QDialog):
     def _check(self):
         s = st.load_settings()
         pwd = self._ed.text()
-        if pwd == s.get('master_password', 'winsa2024'):
+        if pwd == s.get('master_password', '12345678'):
             self.role = 'master'
             self.accept()
         elif pwd == s.get('user_password', '1234'):
@@ -144,6 +146,7 @@ class AyarlarDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle('⚙  Ayarlar')
         self.setMinimumWidth(520)
+        apply_kiosk(self)   # tam ekran, çerçevesiz kiosk modu
         self.setModal(True)
         self._role = None
         self._settings = st.load_settings()
@@ -294,13 +297,31 @@ class AyarlarDialog(QDialog):
     # ── Master Ayarları Sekmesi ───────────────────────────────────
 
     def _build_master_tab(self) -> QWidget:
+        """Master ayarları — 4 alt sekme: Makine Listesi, Makine Program
+        Seçimi, Profil Tanımlama, Şifre Yönetimi."""
+        w = QWidget()
+        lay = QVBoxLayout(w)
+        lay.setContentsMargins(0, 6, 0, 0)
+        lay.setSpacing(0)
+
+        sub_tabs = QTabWidget()
+        sub_tabs.addTab(self._build_machine_list_tab(),    '🏭  Makine Listesi')
+        sub_tabs.addTab(self._build_machine_program_tab(), '💻  Makine Program Seçimi')
+        sub_tabs.addTab(self._build_profil_tanimlama_tab(),'📚  Profil Tanımlama')
+        sub_tabs.addTab(self._build_password_tab(),        '🔐  Şifre Yönetimi')
+        lay.addWidget(sub_tabs)
+
+        return w
+
+    # ── Master alt sekme 1: Makine Listesi ─────────────────────────
+
+    def _build_machine_list_tab(self) -> QWidget:
         w = QWidget()
         lay = QVBoxLayout(w)
         lay.setSpacing(10)
         lay.setContentsMargins(10, 10, 10, 10)
 
-        # Makine Seçimi
-        grp_mach = QGroupBox('🏭  Makine Seçimi  (kullanılan makineleri işaretle)')
+        grp_mach = QGroupBox('🏭  Veri Gönderilecek Makine Listesi  (kullanılan makineleri işaretle)')
         mv = QVBoxLayout(grp_mach)
         mv.setSpacing(8)
 
@@ -317,8 +338,92 @@ class AyarlarDialog(QDialog):
             mv.addWidget(cb)
 
         lay.addWidget(grp_mach)
+        lay.addStretch()
+        return w
 
-        # Şifre Değiştir
+    # ── Master alt sekme 2: Makine Program Seçimi ──────────────────
+
+    def _build_machine_program_tab(self) -> QWidget:
+        w = QWidget()
+        lay = QVBoxLayout(w)
+        lay.setSpacing(10)
+        lay.setContentsMargins(10, 10, 10, 10)
+
+        grp = QGroupBox('💻  Makine Program Seçimi')
+        gv = QVBoxLayout(grp)
+        gv.setSpacing(8)
+
+        info = QLabel('Üretimde kullanılacak makine programını seçin.')
+        info.setObjectName('note')
+        info.setWordWrap(True)
+        gv.addWidget(info)
+
+        self._rb_program_group = QButtonGroup(w)
+
+        self._rb_pim_dc = QRadioButton('PIM ve DC')
+        self._rb_pim_dc.setFont(QFont('Arial', 12))
+        self._rb_program_group.addButton(self._rb_pim_dc)
+        gv.addWidget(self._rb_pim_dc)
+        lbl_pim_dc = QLabel('Seçiliyse program şu anki gibi çalışmaya devam eder.')
+        lbl_pim_dc.setObjectName('note')
+        lbl_pim_dc.setWordWrap(True)
+        gv.addWidget(lbl_pim_dc)
+
+        self._rb_ncr = QRadioButton('NCR')
+        self._rb_ncr.setFont(QFont('Arial', 12))
+        self._rb_program_group.addButton(self._rb_ncr)
+        gv.addWidget(self._rb_ncr)
+        lbl_ncr = QLabel('Seçiliyse ilave çalışma gerekir — bu özellik henüz aktif değil (sonraki adım).')
+        lbl_ncr.setObjectName('note')
+        lbl_ncr.setWordWrap(True)
+        gv.addWidget(lbl_ncr)
+
+        lay.addWidget(grp)
+        lay.addStretch()
+        return w
+
+    # ── Master alt sekme 3: Profil Tanımlama ───────────────────────
+
+    def _build_profil_tanimlama_tab(self) -> QWidget:
+        w = QWidget()
+        lay = QVBoxLayout(w)
+        lay.setSpacing(10)
+        lay.setContentsMargins(10, 10, 10, 10)
+
+        grp = QGroupBox('📚  Profil Tanımlama')
+        gv = QVBoxLayout(grp)
+        gv.setSpacing(8)
+
+        info = QLabel(
+            'Profil kütüphanesine tam erişim: yeni profil ekleme, kopyalama, '
+            'silme ve toplu Excel yükleme burada yapılır.'
+        )
+        info.setObjectName('note')
+        info.setWordWrap(True)
+        gv.addWidget(info)
+
+        btn_open = QPushButton('📚  Profil Kütüphanesini Aç')
+        btn_open.setObjectName('save')
+        btn_open.setFixedHeight(36)
+        btn_open.clicked.connect(self._open_profil_kutuphanesi)
+        gv.addWidget(btn_open)
+
+        lay.addWidget(grp)
+        lay.addStretch()
+        return w
+
+    def _open_profil_kutuphanesi(self):
+        dlg = ProfilKutuphanesiDialog(self, restricted=False)
+        dlg.exec()
+
+    # ── Master alt sekme 4: Şifre Yönetimi ─────────────────────────
+
+    def _build_password_tab(self) -> QWidget:
+        w = QWidget()
+        lay = QVBoxLayout(w)
+        lay.setSpacing(10)
+        lay.setContentsMargins(10, 10, 10, 10)
+
         grp_pwd = QGroupBox('🔐  Şifre Yönetimi')
         pg = QGridLayout(grp_pwd); pg.setSpacing(10)
 
@@ -340,7 +445,6 @@ class AyarlarDialog(QDialog):
 
         lay.addWidget(grp_pwd)
         lay.addStretch()
-
         return w
 
     # ─────────────────────────────────────────────────────────────
@@ -362,6 +466,11 @@ class AyarlarDialog(QDialog):
             selected = s.get('selected_machines', [])
             for machine, cb in self._machine_checks.items():
                 cb.setChecked(machine in selected)
+            # Makine program seçimi
+            if s.get('machine_program', 'PIM_DC') == 'NCR':
+                self._rb_ncr.setChecked(True)
+            else:
+                self._rb_pim_dc.setChecked(True)
             # Şifre alanları boş (gösterme)
             self._ed_master_pwd.clear()
             self._ed_user_pwd.clear()
@@ -382,6 +491,8 @@ class AyarlarDialog(QDialog):
             data['selected_machines'] = [
                 m for m, cb in self._machine_checks.items() if cb.isChecked()
             ]
+            # Makine program seçimi
+            data['machine_program'] = 'NCR' if self._rb_ncr.isChecked() else 'PIM_DC'
             # Şifreler — sadece dolu ise güncelle
             s = st.load_settings()
             new_mpwd = self._ed_master_pwd.text().strip()
@@ -389,7 +500,7 @@ class AyarlarDialog(QDialog):
             if new_mpwd:
                 data['master_password'] = new_mpwd
             else:
-                data['master_password'] = s.get('master_password', 'winsa2024')
+                data['master_password'] = s.get('master_password', '12345678')
             if new_upwd:
                 data['user_password'] = new_upwd
             else:

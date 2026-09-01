@@ -1,14 +1,15 @@
 """
 settings.py
-Winsa Profil Kesim – uygulama geneli kalıcı ayarlar.
+ProfiDO (KSB_ProfilKesim) – uygulama geneli kalıcı ayarlar.
 
-Dosya konumu: ~/.winsa_profil/settings.json
+Dosya konumu: ~/.ksb_profil/settings.json
 """
 
 import json
 import os
+import paths
 
-_SETTINGS_DIR  = os.path.join(os.path.expanduser('~'), '.winsa_profil')
+_SETTINGS_DIR  = paths.app_data_dir()
 _SETTINGS_PATH = os.path.join(_SETTINGS_DIR, 'settings.json')
 
 # ── Varsayılan değerler ────────────────────────────────────────────────────────
@@ -27,8 +28,12 @@ DEFAULTS: dict = {
     # ── Makine seçimi (Master ayarı) ──────────────────────────────────
     'selected_machines': ['DC 421'],   # Aktif makineler listesi
 
+    # ── Makine program seçimi (Master ayarı) ──────────────────────────
+    # 'PIM_DC' → şu anki mevcut çalışma şekli. 'NCR' → ilave çalışma gerektirir.
+    'machine_program': 'PIM_DC',
+
     # ── Şifreler ──────────────────────────────────────────────────────
-    'master_password': 'winsa2024',   # Tam yetkili şifre
+    'master_password': '12345678',    # Tam yetkili şifre
     'user_password':   '1234',        # Kısıtlı kullanıcı şifresi
 
     # ── Varsayılan müşteri bilgileri ──────────────────────────────────

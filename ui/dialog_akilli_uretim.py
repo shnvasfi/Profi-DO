@@ -1,6 +1,6 @@
 """
 ui/dialog_akilli_uretim.py – Akıllı Üretim Ekranı
-Winsa Profil Kesim Programı
+ProfiDO (KSB_ProfilKesim) Programı
 
 Akış:
   1. Üst çubuk: Her profil tipi için "yapışkan" stok kodu seçimi
@@ -12,7 +12,7 @@ Akış:
 
 import os
 import sys
-# ui/ alt klasöründen çalışırken proje kökünü (winsa_profil_kesim/) path'e ekle
+# ui/ alt klasöründen çalışırken proje kökünü path'e ekle
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
@@ -30,6 +30,7 @@ from PySide6.QtGui import QColor, QFont, QBrush
 
 import code_generator as cg
 import settings as st
+from ui.kiosk import apply_kiosk
 
 SIDES = ['ALT', 'ÜST', 'SOL', 'SAĞ']
 SIDE_ICONS = {'ALT': '⬇', 'ÜST': '⬆', 'SOL': '⬅', 'SAĞ': '➡'}
@@ -1102,6 +1103,7 @@ class AkilliUretimDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle('Akıllı Üretim')
         self.resize(1200, 750)
+        apply_kiosk(self)   # tam ekran, çerçevesiz kiosk modu
         self.setStyleSheet(_STYLE)
 
         self._db      = db
