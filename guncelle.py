@@ -24,6 +24,7 @@ files = [
     ('ui/dialog_batch.py',                     'ui/dialog_batch.py'),
     ('ui/dialog_kanat_auto.py',                'ui/dialog_kanat_auto.py'),
     ('ui/splash_screen.py',                    'ui/splash_screen.py'),
+    ('yilmaz_logo.png',                        'yilmaz_logo.png'),
     ('main.py',                                'main.py'),
     ('ui/viewport_widget.py',                  'ui/viewport_widget.py'),
     ('ui/dialog_profil_kutuphanesi.py',        'ui/dialog_profil_kutuphanesi.py'),
@@ -54,7 +55,24 @@ for src_rel, dst_rel in files:
     src = os.path.join(SRC, src_rel)
     try:
         os.makedirs(os.path.dirname(os.path.abspath(dst_rel)) if os.path.dirname(dst_rel) else '.', exist_ok=True)
-        shutil.copy(src, dst_rel)
+
+        # Hedef zaten varsa ve salt-okunursa (kaynaktan miras kalmis olabilir),
+        # once yazilabilir hale getir — yoksa uzerine yazma islemi patlar.
+        if os.path.exists(dst_rel):
+            try:
+                os.chmod(dst_rel, 0o644)
+            except Exception:
+                pass
+
+        # copyfile: SADECE icerigi kopyalar, kaynagin izin bitlerini
+        # (orn. salt-okunur / +x kaybi) hedefe TASIMAZ — bu sayede tekrar
+        # tekrar calistirilabilir kalir. Kaynagin +x biti bu ortamda
+        # guvenilir olmadigindan (senkronizasyon sirasinda kaybolabiliyor),
+        # calistirilabilirligi DOSYA UZANTISINA gore biz belirliyoruz.
+        shutil.copyfile(src, dst_rel)
+        is_exec = dst_rel.endswith(('.command', '.sh'))
+        os.chmod(dst_rel, 0o755 if is_exec else 0o644)
+
         print('Kopyalandi:', dst_rel)
     except FileNotFoundError:
         # Kaynakta artik olmayan (kaldirilmis) bir dosya - atla, devam et.

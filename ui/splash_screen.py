@@ -17,10 +17,11 @@ if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 from version import __version__ as APP_VERSION
 
-# ── Fotoğraf yolu ────────────────────────────────────────
-# Program klasörünün altındaki ProfiDO_IM.png dosyası
+# ── Fotoğraf / logo yolları ────────────────────────────────
+# Program klasörünün altındaki dosyalar
 _BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PHOTO_PATH = os.path.join(_BASE, 'ProfiDO_IM.png')
+LOGO_PATH  = os.path.join(_BASE, 'yilmaz_logo.png')
 
 random.seed(42)
 
@@ -532,7 +533,7 @@ class SplashScreen(QWidget):
             fy += 42
 
     def _draw_signature(self, p, W, H, fa):
-        """Sağ alt köşe — el yazısı imza. Kesinlikle görünür."""
+        """Ekranın sol alt köşesi — üstte Yılmaz logosu, altında el yazısı imza."""
         from PySide6.QtGui import QFontDatabase
         cursive_fonts = [
             'Snell Roundhand', 'Apple Chancery', 'Bradley Hand ITC',
@@ -548,19 +549,28 @@ class SplashScreen(QWidget):
         # Ölç
         p.setFont(f_sign)
         fm_s = p.fontMetrics()
-        sign_w = fm_s.horizontalAdvance(NAME)
         sign_h = fm_s.height()
 
-        pad   = 8
-        box_w = sign_w + pad * 2
-        box_h = sign_h + 6
-        # Hexagon içi — alt bölüm, merkeze yakın sol
-        box_x = int(W * 0.2075) - box_w // 2
-        box_y = int(H * 0.71)
+        margin_x   = 36   # alt ilerleme çubuğuyla aynı sol boşluk
+        logo_h     = 40
+        gap        = 8    # logo ile imza arası boşluk
+        bottom_pad = 58   # alt ilerleme çubuğunun (H-44) üstünde kalsın
+
+        sig_y  = H - bottom_pad                  # imza taban çizgisi
+        logo_y = sig_y - sign_h - gap - logo_h    # logonun üst kenarı
+
+        # ── Yılmaz logosu ──
+        logo_pix = QPixmap(LOGO_PATH)
+        if not logo_pix.isNull():
+            logo_w = int(logo_h * logo_pix.width() / max(1, logo_pix.height()))
+            p.save()
+            p.setOpacity(fa / 255)
+            p.drawPixmap(margin_x, int(logo_y), logo_w, logo_h, logo_pix)
+            p.setOpacity(1.0)
+            p.restore()
 
         # ── İmza metni (arka plan yok) ──
-        sig_x = box_x + pad
-        sig_y = box_y + sign_h - 3
+        sig_x = margin_x
 
         # Gölge
         p.setFont(f_sign)

@@ -41,8 +41,9 @@ def run(cmd, check=True, capture=False):
 
 
 def prepare_version() -> str:
-    """version.py'yi okur; surum etiketi GitHub'da zaten varsa otomatik
-    bir ust surume ceker ve version.py'yi gunceller."""
+    """version.py'yi okur; surum etiketi GitHub'da zaten varsa (bir ya da
+    birden fazla kez) bos bir surum numarasi bulana kadar otomatik ileri
+    ceker ve version.py'yi gunceller."""
     with open('version.py', encoding='utf-8') as f:
         content = f.read()
 
@@ -52,12 +53,17 @@ def prepare_version() -> str:
         sys.exit(1)
     major, minor, patch = map(int, m.groups())
 
-    tag = f'v{major}.{minor}.{patch}'
-    exists = run(['git', 'ls-remote', '--tags', 'origin', f'refs/tags/{tag}'],
-                 check=False, capture=True).stdout.strip()
-
-    if exists:
+    bumped = False
+    while True:
+        tag = f'v{major}.{minor}.{patch}'
+        exists = run(['git', 'ls-remote', '--tags', 'origin', f'refs/tags/{tag}'],
+                     check=False, capture=True).stdout.strip()
+        if not exists:
+            break
         patch += 1
+        bumped = True
+
+    if bumped:
         new_version = f'{major}.{minor}.{patch}'
         new_content = re.sub(
             r'__version__\s*=\s*"[^"]+"',

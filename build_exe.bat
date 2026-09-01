@@ -29,6 +29,8 @@ echo.
 echo [3/4] Derleniyor (birkac dakika surebilir)...
 pyinstaller --noconfirm --onefile --windowed --name "KSB_ProfilKesim" ^
   --add-data "ui;ui" ^
+  --add-data "ProfiDO_IM.png;." ^
+  --add-data "yilmaz_logo.png;." ^
   main.py
 
 echo.
