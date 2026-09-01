@@ -12,6 +12,7 @@ build/
 dist/
 *.dmg
 *.exe
+*.spec
 
 # ── Java köprüsü (Mac MDB) derleme çıktısı ───────────────────
 java_libs/*.class

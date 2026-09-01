@@ -1,12 +1,14 @@
 name: Build (macOS + Windows)
 
 # Ne zaman çalışır:
-#   - main dalına her push'ta          -> sadece derler, indirilebilir "artifact" üretir (test amaçlı)
-#   - "v1.0.0" gibi bir tag push'unda  -> derler VE GitHub Releases'e otomatik yükler
+#   - "v1.0.0" gibi bir SÜRÜM ETİKETİ push'unda -> derler VE GitHub Releases'e otomatik yükler
+#     (yayinla.py / guncelle_ve_yayinla.command her yayında otomatik etiket oluşturup gönderir)
 #   - Actions sekmesinden manuel de tetiklenebilir (workflow_dispatch)
+# NOT: Sıradan "main" push'larında ARTIK derleme YAPILMAZ — bu, macOS runner
+#      kuyruğunu gereksiz yere iki katına çıkarmamak içindir. Her yayın zaten
+#      otomatik olarak bir sürüm etiketi aldığı için tek bir derleme döngüsü yeterli.
 on:
   push:
-    branches: [ main ]
     tags: [ 'v*' ]
   workflow_dispatch: {}
 
@@ -64,11 +66,21 @@ jobs:
         with:
           path: artifacts
 
+      - name: Çıktıları tek dosya halinde zip'le
+        # macOS .app bir klasördür; zip'lenmeden paylaşılırsa izinler/iç yapı
+        # bozulabilir. Windows tarafı da tutarlılık için aynı şekilde zip'lenir.
+        run: |
+          cd artifacts/KSB_ProfilKesim-Windows
+          zip -r ../../KSB_ProfilKesim-Windows.zip .
+          cd ../../artifacts/KSB_ProfilKesim-macOS
+          zip -ry ../../KSB_ProfilKesim-macOS.zip .
+          cd ../..
+
       - name: Release oluştur / güncelle
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/KSB_ProfilKesim-Windows/**
-            artifacts/KSB_ProfilKesim-macOS/**
+            KSB_ProfilKesim-Windows.zip
+            KSB_ProfilKesim-macOS.zip
           draft: false
           generate_release_notes: true

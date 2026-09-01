@@ -44,6 +44,8 @@ files = [
     ('build_exe.bat',                          'build_exe.bat'),
     ('setup_windows.bat',                      'setup_windows.bat'),
     ('setup_mac.sh',                           'setup_mac.sh'),
+    ('yayinla.py',                             'yayinla.py'),
+    ('guncelle_ve_yayinla.command',            'guncelle_ve_yayinla.command'),
     ('guncelle.py',                            'guncelle.py'),   # kendini de guncelle
 ]
 
