@@ -46,6 +46,7 @@ files = [
     ('setup_mac.sh',                           'setup_mac.sh'),
     ('yayinla.py',                             'yayinla.py'),
     ('guncelle_ve_yayinla.command',            'guncelle_ve_yayinla.command'),
+    ('mac_derle.command',                      'mac_derle.command'),
     ('guncelle.py',                            'guncelle.py'),   # kendini de guncelle
 ]
 
