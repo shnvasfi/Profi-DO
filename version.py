@@ -6,4 +6,4 @@ değer otomatik olarak gösterilir. Her yeni özellik/düzeltme GitHub'a
 gönderilmeden önce bu değer bir üst sürüme çıkarılır.
 """
 
-__version__ = "1.3.3"
+__version__ = "1.3.4"

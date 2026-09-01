@@ -42,11 +42,16 @@ jobs:
           pip install pyinstaller
 
       - name: Derle (PyInstaller)
+        # NOT: ProfiDO_IM.png depoya kasitli olarak eklenmedi (kisisel/is
+        # fotografi). Bundan dolayi GitHub derlemesinde bu dosya paketlenmez;
+        # kod zaten dosya yoksa otomatik olarak yedek logo ciziminie
+        # duser (splash_screen.py -> _draw_hex_logo). Yerel derlemede
+        # (mac_derle.command / build_exe.bat) dosya mevcut oldugundan
+        # orada gercek fotograf kullanilir.
         run: >
           pyinstaller --noconfirm --onefile --windowed
           --name "KSB_ProfilKesim"
           --add-data "ui${{ matrix.add_data_sep }}ui"
-          --add-data "ProfiDO_IM.png${{ matrix.add_data_sep }}."
           --add-data "yilmaz_logo.png${{ matrix.add_data_sep }}."
           main.py
 
